@@ -4,6 +4,7 @@ import { hasCookie } from 'cookies-next';
 import { InfinitySpin, MutatingDots, ProgressBar, Puff, ThreeDots, Triangle } from 'react-loader-spinner';
 import axios from 'axios';
 import Header from './Header';
+import Body from './Body';
 
 
 const page = () => {
@@ -43,8 +44,9 @@ const page = () => {
   else
   {
     return (
-      <div className="relative w-[100vw] h-[100vh]">
+      <div className="relative w-[100vw] flex flex-col h-[100vh]">
         <Header/>
+        <Body/>
       </div>
     )
   }

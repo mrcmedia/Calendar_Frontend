@@ -71,10 +71,9 @@ router.get('/delete-event', async (req,res) => {
             refresh_token:refresh_token
         })
 
-        const calendar = google.calendar('v3')
+        const calendar = google.calendar({version:'v3' , auth:oauth2Client})
 
         const response = await calendar.events.list({
-            auth:oauth2Client,
             calendarId:"primary",
         })
         
