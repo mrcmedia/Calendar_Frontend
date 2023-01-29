@@ -15,7 +15,7 @@ const Header = () => {
 
     return (
     <div>
-        <div className='w-full shadow-md relative flex items-center h-[70px] p-1 md:p-3 '>
+        <div className='w-full hidden shadow-md relative md:flex items-center h-[70px] p-1 md:p-3 '>
         <section className='relative flex-1'>
             <h1 className='text-2xl sm:text-4xl'>Calendar</h1>
             <p className='top-[-8px] relative text-xs sm:text-lg left-1 underline'>Mahinda Rajapaksha College Homagama.</p>

@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @media only screen and (min-width:640px)
 {
     ::-webkit-scrollbar{
@@ -23,4 +22,24 @@
     ::-webkit-scrollbar-thumb:hover {
         background: #555; 
     }
+}
+
+.openme{
+    animation-name: openmenu;
+    animation-duration: 0.1s;
+}
+
+.closeme{
+    animation-name: closemenu;
+    animation-duration: 0.25s;
+}
+
+@keyframes openmenu {
+    From{opacity: 0; width: 0%;}
+    To{opacity: 1;  width: 100%;}
+}
+
+@keyframes closemenu {
+    From{opacity: 1; width: 100%;}
+    To{opacity: 0; width: 0%;}
 }
