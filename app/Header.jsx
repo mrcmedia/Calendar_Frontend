@@ -1,6 +1,5 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
-import Hamburger from 'hamburger-react'
 
 const Header = () => {
     const [userLogo, setuserLogo] = useState('');
@@ -21,7 +20,7 @@ const Header = () => {
             <p className='top-[-8px] relative text-xs sm:text-lg left-1 underline'>Mahinda Rajapaksha College Homagama.</p>
         </section>
         <h4 className='mr-2 text-sm hidden sm:block'>{userName}</h4>
-        <img className='w-[45px] sm:mr-0 sm:w-[50px] rounded-full' src={userLogo} alt="dp" />
+        <img width={'45'} height={'45'} className='w-[45px] sm:mr-0 sm:w-[50px] rounded-full' src={userLogo} alt="dp" />
         </div>
     </div>
   )

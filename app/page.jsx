@@ -11,7 +11,6 @@ const page = () => {
   const [Verrified, setVerrified] = useState(false)
   useEffect(() => {
     axios.get('/api/calendar/auth/verify-cookie' ,).then((response)=> {
-      console.log(response.data)
       setVerrified(response.data.verrified)
 
     }).catch((error) => {

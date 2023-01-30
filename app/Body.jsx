@@ -69,9 +69,9 @@ const Body = () => {
         <h2 className='p-1 sm:p-3 text-xl'>Calendar Operations.</h2>
       </section>
       <div className='absolute  top-0 left-0 right-0 bottom-0 flex'>
-      <div id='menu' className='lg:flex-[0.2] hidden md:block md:flex-[0.4] mt-12 shadow-2xl pb-5 md:pb-0 overflow-scroll'>
+      <div id='menu' className='lg:flex-[0.2] hidden md:block md:flex-[0.4] mt-11 sm:mt-12 shadow-2xl pb-5 md:pb-0 overflow-scroll'>
         <section className='w-full  bg-blue-600 text-white shadow-xl'>
-          <section className='flex items-center p-2 sm:p-0'>
+          <section className='flex items-center p-4 sm:p-0'>
             <section className=' px-3 mt-1 flex-1 sm:mt-3 w-full flex flex-col'>
                 <Clock
                 format={'HH:mm'}
@@ -81,7 +81,7 @@ const Body = () => {
                 <h1 className='text-sm sm:text-xl relative bottom-2 mb-1 sm:mb-3'>{date}</h1>
             </section>
             <section className='md:hidden flex flex-col items-center justify-center pr-3'>
-              <img className='rounded-full w-[50%]' src={userLogo} alt="logo/ac" />
+            <img src={userLogo} width={'45'} height={'45'} className='w-[45px] sm:mr-0 sm:w-[50px] rounded-full' alt="dp" />
               <p>{userName}</p>
             </section>
           </section>
@@ -96,10 +96,10 @@ const Body = () => {
             <textarea placeholder='Description' className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mb-3 mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='description' />
 
             <label className='bg-white text-sm' htmlFor="startDate">Start Date & Time : </label>
-            <input value={'2022-04-23T14:00:30'} type="datetime-local" className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
+            <input defaultValue={'2023-01-01T12:00:30'} type="datetime-local" className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
 
             <label className='bg-white text-sm' htmlFor="endDate">End Date & Time : </label>
-            <input value={'2022-04-23T14:00:30'} type="datetime-local" className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
+            <input defaultValue={'2023-01-01T12:00:30'} type="datetime-local" className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
 
             <label className='bg-white text-sm' htmlFor="endDate">Location :</label>
             <select className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id="">
@@ -141,7 +141,7 @@ const Body = () => {
             <textarea placeholder='teacher security' className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mb-3 mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='description' />
 
             <label className='bg-white text-sm' htmlFor="startDate">Date Of Birth : </label>
-            <input type="datetime-local" value={'2022-04-23T14:00:30'} className=' outline-slate-200 bg-white outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
+            <input type="datetime-local" defaultValue={'2023-01-01T12:00:30'} className=' outline-slate-200 bg-white outline rounded-sm w-full transition-shadow mt-1 mb-3 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
 
 
             <button className='w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Birthday</button>

@@ -3,6 +3,9 @@ const express = require('express')
 const {google} = require('googleapis')
 const { base64decode } = require('nodejs-base64');
 const config = require('config')
+const cookie = require('cookie')
+const jwt = require('jsonwebtoken')
+const {VerifyError} = require('../../../utils/CustomErrors')
 
 const {OAuth2} = google.auth;
 
@@ -13,10 +16,25 @@ const oauth2Client = new OAuth2(
     process.env.CLIENT_SECRET
 )
 
+
+function Verrify(request)
+{
+    const auth_cookie = cookie.parse(request.headers.cookie).auth;
+    if(auth_cookie)
+    {
+        return jwt.verify(auth_cookie , process.env.JWT_SECRET).email;
+    }
+    else{
+        throw new VerifyError('Cookie error')
+    }
+}
+
 router.get('/create-event', async (req,res) => {
+    
     try
     {
-        const rt = await axios.get(`${config.get('git_url')}/${req.query.email}`,
+        const email = Verrify(req);
+        const rt = await axios.get(`${config.get('git_url')}/${email}`,
         {
             headers:{
             "Authorization":`${process.env.GITPA_TOKEN}`,
@@ -37,21 +55,30 @@ router.get('/create-event', async (req,res) => {
                 location:"Homagama, Sri Lanka",
                 description:"Kohomada machan ithin aaaa",
                 start:{
-                    dateTime:new Date('2022-04-23T14:00:30')
+                    dateTime:new Date('2023-01-30T15:00:30')
                 },
                 end:{
-                    dateTime:new Date('2022-04-23T15:59:30')
+                    dateTime:new Date('2023-01-30T16:00:30')
                 },
                 colorId:7
             }
         })
-        const date = new Date();
-
+        res.status(response.status).json(response.data);
     }
     catch(err)
     {
-        res.status(err.response.status).json(err.message)
-
+        if(err instanceof jwt.JsonWebTokenError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof VerifyError)
+        {
+            res.status(400).json(err.message);
+        }
+        else
+        {
+            res.status(err.response.status).json(err.message)
+        }
     }
 });
 
@@ -86,7 +113,6 @@ router.get('/delete-event', async (req,res) => {
 
     }
 })
-
 
 module.exports = router;
 
