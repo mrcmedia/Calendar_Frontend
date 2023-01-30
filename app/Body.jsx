@@ -3,35 +3,63 @@ import Hamburger from 'hamburger-react';
 import React, { useEffect, useState } from 'react'
 import Clock from 'react-live-clock';
 import {useForm} from 'react-hook-form';
+import { RotatingLines } from 'react-loader-spinner';
+const SriLanka = require('get-srilanka-districts-cities');
+
+
+
 
 const Body = () => {
+
+  //#region Constances
+
   const [date] = useState(new Date().toLocaleString("en-LK", {timeZone: "Asia/Colombo", dateStyle:'long'}));
   const [DayOfWeek] = useState(new Date().toLocaleString("en-LK", {timeZone: "Asia/Colombo", weekday:'long'}));
-
   const [userLogo, setuserLogo] = useState('');
   const [userName, setUserName] = useState('');
   const [IsBig , setIsBig] = useState(window.innerWidth >= 768);
   const [Width, setWidth] = useState(0);
+  const [SlCities, setSlCities] = useState([])
+  const [Load, setLoad] = useState(false);
 
   const EventForm = useForm();
   const BirthdayForm = useForm();
 
-  const handleEventSubmit = (event) => {
-    console.log(event);
-    document.getElementById('eventForms').reset();
-  }
+  //#endregion
 
-  const handleBirthdaySubmit = (event) => {
-    console.log(event);
-    document.getElementById('birthdayForms').reset();
-  }
-
+//#region useEffects  
   useEffect(() => {
     axios.get('/api/calendar/auth/get-user').then((response)=> {
         setuserLogo(response.data.picture)
         setUserName(response.data.name)
     })
   }, [])
+
+  useEffect(() => {
+    if(SlCities.length == 0)
+    {
+      SriLanka.provinceList()[0].map((provices) => {
+        SriLanka.getDistrictList(provices)[0].map((cities) => {
+          SriLanka.cityList(provices , cities)[0].map((items) => {
+            setSlCities(SlCities => [...SlCities , items]);
+          })
+        })
+      })
+    }
+  }, [SlCities])
+
+  useEffect(() => {
+    window.addEventListener('resize' , CheckWidth);
+    return() => {
+      window.removeEventListener('resize' , CheckWidth)
+    }
+  },[])
+
+//#endregion
+
+//#region Basicfunctions
+
+  
 
   function CheckWidth(event)
   {
@@ -50,12 +78,6 @@ const Body = () => {
     }
     setWidth(event.target.innerWidth);
   } 
-  useEffect(() => {
-    window.addEventListener('resize' , CheckWidth);
-    return() => {
-      window.removeEventListener('resize' , CheckWidth)
-    }
-  },[])
   
 
   const HandleMenu = (e) => {
@@ -75,6 +97,30 @@ const Body = () => {
       }, 200);
     }
   }
+  //#endregion
+
+
+  const handleEventSubmit = async (event) => {
+    setLoad(true);
+    try
+    {
+      const response = await axios.post('/api/calendar/operations/create-event',event)
+      document.getElementById('eventForms').reset();
+      setLoad(false);
+    }
+    catch(err)
+    {
+      setLoad(false);
+      console.error(err.message);
+      console.log(event);
+    }
+  }
+
+  const handleBirthdaySubmit = (event) => {
+    document.getElementById('birthdayForms').reset();
+
+  }
+
 
   return (
     <div className='flex-1 w-full relative'>
@@ -112,43 +158,32 @@ const Body = () => {
             {EventForm.formState.errors.description && <p className='text-sm w-full text-red-600 mb-3'>Description about event required!</p>}
 
             <label className='bg-white text-sm' htmlFor="startDate">Start Date & Time : </label>
-            <input {...EventForm.register('startDate', {required:true})}  name='startDate' defaultValue={'2023-01-01T12:00:30'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
+            <input {...EventForm.register('startDate', {required:true})}  name='startDate' defaultValue={'2023-01-01T12:00'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
             {EventForm.formState.errors.startDate && <p className='text-sm w-full text-red-600 mb-3'>Starting Date required!</p>}
 
             <label className='bg-white text-sm' htmlFor="endDate">End Date & Time : </label>
-            <input {...EventForm.register('endDate', {required:true})} name='endDate' defaultValue={'2023-01-01T12:00:30'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
+            <input {...EventForm.register('endDate', {required:true})} name='endDate' defaultValue={'2023-01-01T12:00'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
             {EventForm.formState.errors.endDate && <p className='text-sm w-full text-red-600 mb-3'>Ending Date required!</p>}
 
             <label className='bg-white text-sm' htmlFor="location">Location :</label>
-            <select {...EventForm.register('location', {required:true})} name='location' className='bg-white outline-slate-200 mb-3 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id="location">
-              <option value="Homagama , Sri Lanka">Homagama , Sri Lanka</option>
-              <option value="Sri Lanka">Sri Lanka</option>
-              <option value="Kalutara , Sri Lanka">Kalutara , Sri Lanka</option>
-              <option value="Gampaha , Sri Lanka">Gampaha , Sri Lanka</option>
-              <option value="Matara , Sri Lanka">Matara , Sri Lanka</option>
-              <option value="Galle , Sri Lanka">Galle , Sri Lanka</option>
-              <option value="Hambanthota , Sri Lanka">Hambanthota , Sri Lanka</option>
-              <option value="Trincomale , Sri Lanka">Trincomale , Sri Lanka</option>
-              <option value="Madakalapuwa , Sri Lanka">Madakalapuwa , Sri Lanka</option>
-              <option value="Jaffna , Sri Lanka">Jaffna , Sri Lanka</option>
-              <option value="Mulathiv , Sri Lanka">Mulathiv , Sri Lanka</option>
-              <option value="Puththalama , Sri Lanka">Puththalama , Sri Lanka</option>
-              <option value="Anuradhapura , Sri Lanka">Anuradhapura , Sri Lanka</option>
-              <option value="Polonnaruwa , Sri Lanka">Polonnaruwa , Sri Lanka</option>
-              <option value="Kandy , Sri Lanka">Kandy , Sri Lanka</option>
-              <option value="Nuwara Eliya , Sri">Nuwara Eliya , Sri Lanka</option>
-              <option value="Badulla , Sri Lanka">Badulla , Sri Lanka</option>
-              <option value="Badulla , Sri Lanka">Badulla , Sri Lanka</option>
-              <option value="Badulla , Sri Lanka">Badulla , Sri Lanka</option>
-              <option value="Halawatha , Sri Lanka">Halawatha , Sri Lanka</option>
-              <option value="Mannarama , Sri Lanka">Mannarama , Sri Lanka</option>
-              <option value="Matale , Sri Lanka">Matale , Sri Lanka</option>
-              <option value="Dambulla , Sri Lanka">Dambulla , Sri Lanka</option>
-              <option value="Katharagama , Sri Lanka">Katharagama , Sri Lanka</option>
+            <select defaultValue='Pitipana Homagama, Sri Lanka' {...EventForm.register('location', {required:true})} name='location' className='bg-white outline-slate-200 mb-3 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id="location">
+            <option value={'Pitipana Homagama, Sri Lanka'}>Pitipana Homagama, Sri Lanka</option>
+              {SlCities.length > 0 && SlCities.map((itemss) => {
+                return (<option key={`${Math.random()} ${itemss} `} value={`${itemss}, Sri Lanka`}>{itemss}, Sri Lanka</option>)
+              })}
             </select>
             {EventForm.formState.errors.location && <p className='text-sm w-full text-red-600 mb-3'>Location required!</p>}
             <button className=' w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Event</button>
           </form>
+          {Load && <span className='absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black/80'>
+            <RotatingLines
+              strokeColor="white"
+              strokeWidth="5"
+              animationDuration="0.75"
+              width="96"
+              visible={true}
+            />
+          </span>}
         </section>
         <p className='bg-white text-center mt-3 text-slate-400'> ------ OR ------ </p>
         <h1 className='bg-white text-center text-md mt-5'>Add Birthday</h1>
@@ -162,7 +197,7 @@ const Body = () => {
             {BirthdayForm.formState.errors.birthdaydescription && <p className='text-sm w-full text-red-600 mb-3'>Some description required!</p>}
 
             <label className='bg-white text-sm' htmlFor="dateofbirth">Date Of Birth : </label>
-            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="datetime-local" defaultValue={'2023-01-01T12:00:30'} className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
+            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="datetime-local" defaultValue={'2023-01-01T12:00'} className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
             {BirthdayForm.formState.errors.dateofbirth && <p className='text-sm w-full text-red-600 mb-3'>Date of Birth required!</p>}
             <button className='w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Birthday</button>
           </form>

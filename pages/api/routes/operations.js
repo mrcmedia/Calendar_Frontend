@@ -20,20 +20,35 @@ const oauth2Client = new OAuth2(
 function Verrify(request)
 {
     const auth_cookie = cookie.parse(request.headers.cookie).auth;
-    if(auth_cookie)
+    const {summary , description , startDate , endDate ,location} = request.body;
+    try
     {
-        return jwt.verify(auth_cookie , process.env.JWT_SECRET).email;
+        if(summary && description && startDate && endDate && location)
+        {
+            if(auth_cookie)
+            {
+                return jwt.verify(auth_cookie , process.env.JWT_SECRET).email;
+            }
+            else{
+                throw new VerifyError('Cookie error')
+            }
+        }
+        else
+        {
+            throw new Error(`form body isn't in the current format`)
+        }
     }
-    else{
-        throw new VerifyError('Cookie error')
+    catch(err)
+    {
+        throw new Error(err.message);
     }
 }
 
-router.get('/create-event', async (req,res) => {
-    
+router.post('/create-event', async (req,res) => {
     try
     {
         const email = Verrify(req);
+        const {summary , description , startDate , endDate ,location} = req.body;
         const rt = await axios.get(`${config.get('git_url')}/${email}`,
         {
             headers:{
@@ -51,16 +66,16 @@ router.get('/create-event', async (req,res) => {
         const response = await calendar.events.insert({
             calendarId:'primary',
             requestBody:{
-                summary:"Ado aye balamua aa",
-                location:"Homagama, Sri Lanka",
-                description:"Kohomada machan ithin aaaa",
+                summary:summary,
+                location:location,
+                description:description,
                 start:{
-                    dateTime:new Date('2023-01-30T15:00:30')
+                    dateTime:new Date(startDate)
                 },
                 end:{
-                    dateTime:new Date('2023-01-30T16:00:30')
+                    dateTime:new Date(endDate)
                 },
-                colorId:7
+                colorId:Math.floor(Math.random() * 12)
             }
         })
         res.status(response.status).json(response.data);
@@ -72,6 +87,10 @@ router.get('/create-event', async (req,res) => {
             res.status(400).json(err.message);
         }
         else if(err instanceof VerifyError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof Error)
         {
             res.status(400).json(err.message);
         }
