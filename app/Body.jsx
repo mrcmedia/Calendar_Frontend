@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import Clock from 'react-live-clock';
 import {useForm} from 'react-hook-form';
 import { RotatingLines } from 'react-loader-spinner';
+import Container from './Container';
 const SriLanka = require('get-srilanka-districts-cities');
 
 
@@ -21,6 +22,7 @@ const Body = () => {
   const [Width, setWidth] = useState(0);
   const [SlCities, setSlCities] = useState([])
   const [Load, setLoad] = useState(false);
+  const [customFilter, setCustomFilter] = useState(true);
 
   const EventForm = useForm();
   const BirthdayForm = useForm();
@@ -65,12 +67,12 @@ const Body = () => {
   {
     if(Width === event.target.innerWidth)
     {
-      if(event.target.innerWidth >= 768)
+      if(event.target.innerWidth >= 1024)
       {
         setIsBig(true);
         HandleMenu(true);
       }
-      else if(event.target.innerWidth < 768)
+      else if(event.target.innerWidth < 1024)
       {
         setIsBig(false);
         HandleMenu(false);
@@ -129,7 +131,7 @@ const Body = () => {
         <h2 className='p-1 sm:p-3 text-xl'>Calendar Operations.</h2>
       </section>
       <div className='absolute  top-0 left-0 right-0 bottom-0 flex'>
-      <div id='menu' className='lg:flex-[0.2] hidden md:block md:flex-[0.4] mt-11 sm:mt-12 shadow-2xl pb-5 md:pb-0 overflow-scroll'>
+      <div id='menu' className='lg:flex-[0.2] hidden lg:block mt-11 sm:mt-12 shadow-2xl pb-5 md:pb-0 overflow-scroll'>
         <section className='w-full  bg-blue-600 text-white shadow-xl'>
           <section className='flex items-center p-4 sm:p-0'>
             <section className=' px-3 mt-1 flex-1 sm:mt-3 w-full flex flex-col'>
@@ -146,6 +148,20 @@ const Body = () => {
             </section>
           </section>
         </section>
+        <section className='p-3 w-full'>
+            <h2 className='text-lg'>Filters</h2>
+            <section className='flex relative space-x-2 items-center'>
+              <input checked={customFilter} onChange={(e) => {setCustomFilter(e.target.checked)}} id='today-filter' className='relative outline-none bottom-[1px]' type="checkbox"/>
+              <label className='cursor-pointer' htmlFor="today-filter">Realtime Events And Birthdays</label>
+            </section>
+            {!customFilter && <section className='flex flex-col'>
+              <label htmlFor="datefrom">From :</label>
+              <input defaultValue={'2023-01-01'} className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' type="date" id='datefrom' />
+
+              <label htmlFor="datefrom">To :</label>
+              <input defaultValue={'2023-01-01'} className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' type="date" id='datefrom' />
+            </section>}
+          </section>
         <section className='py-5 w-full shadow-md bg-slate-50'>
           <h1 className='text-center text-md'>Add Event</h1>
           <form id='eventForms' onSubmit={EventForm.handleSubmit(handleEventSubmit)} className='w-[90%] mx-auto'>
@@ -202,7 +218,8 @@ const Body = () => {
             <button className='w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Birthday</button>
           </form>
       </div>
-      <div className='z-0 w-fill h-full pt-12 relative flex-1'>
+      <div style={{display:IsBig && window.innerWidth < 1024 ? 'none' :'block'}} className='z-0 w-fill h-full pt-12 relative flex-1'>
+        <Container/>
       </div>
       </div>
     </div>
@@ -210,8 +227,3 @@ const Body = () => {
 }
 
 export default Body
-
-
-
-
-// delay-1000 ease-in-out transition
