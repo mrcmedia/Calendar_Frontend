@@ -18,7 +18,7 @@ const Body = () => {
   const [DayOfWeek] = useState(new Date().toLocaleString("en-LK", {timeZone: "Asia/Colombo", weekday:'long'}));
   const [userLogo, setuserLogo] = useState('');
   const [userName, setUserName] = useState('');
-  const [IsBig , setIsBig] = useState(window.innerWidth >= 768);
+  const [IsBig , setIsBig] = useState(window.innerWidth >= 1024);
   const [Width, setWidth] = useState(0);
   const [SlCities, setSlCities] = useState([])
   const [Load, setLoad] = useState(false);
@@ -102,6 +102,8 @@ const Body = () => {
   //#endregion
 
 
+
+
   const handleEventSubmit = async (event) => {
     setLoad(true);
     try
@@ -113,13 +115,26 @@ const Body = () => {
     catch(err)
     {
       setLoad(false);
-      console.error(err.message);
-      console.log(event);
+      console.error(err.response);
     }
   }
 
-  const handleBirthdaySubmit = (event) => {
-    document.getElementById('birthdayForms').reset();
+  const handleBirthdaySubmit = async (event) => {
+    setLoad(true);
+    try
+    {
+      const response = await axios.post('/api/calendar/operations/create-birthday',event)
+      document.getElementById('birthdayForms').reset();
+      setLoad(false);
+      console.log(response.data);
+    }
+    catch(err)
+    {
+      setLoad(false);
+      console.error(err.response);
+    }
+
+    console.log(event);
 
   }
 
@@ -213,7 +228,7 @@ const Body = () => {
             {BirthdayForm.formState.errors.birthdaydescription && <p className='text-sm w-full text-red-600 mb-3'>Some description required!</p>}
 
             <label className='bg-white text-sm' htmlFor="dateofbirth">Date Of Birth : </label>
-            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="datetime-local" defaultValue={'2023-01-01T12:00'} className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
+            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="date" defaultValue='2023-01-01' className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
             {BirthdayForm.formState.errors.dateofbirth && <p className='text-sm w-full text-red-600 mb-3'>Date of Birth required!</p>}
             <button className='w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Birthday</button>
           </form>

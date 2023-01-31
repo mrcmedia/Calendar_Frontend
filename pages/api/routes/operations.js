@@ -16,18 +16,35 @@ const oauth2Client = new OAuth2(
     process.env.CLIENT_SECRET
 )
 
-
 function Verrify(request)
 {
+    if(request.headers.cookie === undefined) throw new Error('Invalid Headers'); 
     const auth_cookie = cookie.parse(request.headers.cookie).auth;
-    const {summary , description , startDate , endDate ,location} = request.body;
+    var {summary , description , startDate , endDate ,location ,birthdayPerson , birthdaydescription , dateofbirth} = request.body;
     try
     {
         if(summary && description && startDate && endDate && location)
         {
             if(auth_cookie)
             {
-                return jwt.verify(auth_cookie , process.env.JWT_SECRET).email;
+                const email = jwt.verify(auth_cookie , process.env.JWT_SECRET).email
+                return {summary , description , startDate , endDate , location , email};
+            }
+            else{
+                throw new VerifyError('Cookie error')
+            }
+        }
+        else if (birthdayPerson && birthdaydescription && dateofbirth)
+        {
+            if(auth_cookie)
+            {
+                const email = jwt.verify(auth_cookie , process.env.JWT_SECRET).email
+
+                var startDate = new Date(dateofbirth);
+                var endDate = new Date();
+                endDate.setTime(startDate.getTime() +  60 * 60 * 1000)
+
+                return {summary:birthdayPerson , description:birthdaydescription , startDate , endDate , location , email , location:'Pitipana Homagama, Sri Lanka'};
             }
             else{
                 throw new VerifyError('Cookie error')
@@ -47,8 +64,7 @@ function Verrify(request)
 router.post('/create-event', async (req,res) => {
     try
     {
-        const email = Verrify(req);
-        const {summary , description , startDate , endDate ,location} = req.body;
+        const {summary , description , startDate , endDate ,location , email} = Verrify(req);
         const rt = await axios.get(`${config.get('git_url')}/${email}`,
         {
             headers:{
@@ -75,6 +91,66 @@ router.post('/create-event', async (req,res) => {
                 end:{
                     dateTime:new Date(endDate)
                 },
+                colorId:Math.floor(Math.random() * 12),
+            }
+        })
+        res.status(response.status).json(response.data);
+    }
+    catch(err)
+    {
+        if(err instanceof jwt.JsonWebTokenError)
+        {
+            res.status(400).json(err.response);
+        }
+        else if(err instanceof VerifyError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof Error)
+        {
+            res.status(400).json(err.message);
+        }
+        else
+        {
+            res.status(err.response.status).json(err.message)
+        }
+    }
+});
+
+
+
+router.post('/create-birthday', async (req,res) => {
+
+
+    try
+    {
+        const {summary , description , startDate , endDate ,location , email} = Verrify(req);
+        const rt = await axios.get(`${config.get('git_url')}/${email}`,
+        {
+            headers:{
+            "Authorization":`${process.env.GITPA_TOKEN}`,
+            "Content-Type":"application/json"
+            }
+        });
+        const refresh_token = base64decode(rt.data.content)
+        oauth2Client.setCredentials({
+            refresh_token:refresh_token
+        })
+
+        const calendar = google.calendar({version:'v3' , auth:oauth2Client})
+
+        const response = await calendar.events.insert({
+            calendarId:'primary',
+            requestBody:{
+                summary:summary,
+                location:location,
+                description:description,
+                start:{
+                    dateTime:startDate
+                },
+                end:{
+                    dateTime:endDate
+                },
                 colorId:Math.floor(Math.random() * 12)
             }
         })
@@ -100,6 +176,13 @@ router.post('/create-event', async (req,res) => {
         }
     }
 });
+
+
+
+
+
+
+
 
 router.get('/delete-event', async (req,res) => {
 
