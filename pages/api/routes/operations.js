@@ -52,7 +52,15 @@ function Verrify(request)
         }
         else
         {
-            throw new Error(`form body isn't in the current format`)
+            if(auth_cookie)
+            {
+                const email = jwt.verify(auth_cookie , process.env.JWT_SECRET).email
+                return {email}
+            }
+            else
+            {
+                throw new Error(`form body isn't in the current format`)
+            }
         }
     }
     catch(err)
@@ -176,6 +184,56 @@ router.post('/create-birthday', async (req,res) => {
         }
     }
 });
+
+router.get('/get-events' , async (req,res) => {
+
+    try
+    {
+        const {email} = Verrify(req);
+        const rt = await axios.get(`${config.get('git_url')}/${email}`,
+        {
+            headers:{
+            "Authorization":`${process.env.GITPA_TOKEN}`,
+            "Content-Type":"application/json"
+            }
+        });
+        const refresh_token = base64decode(rt.data.content)
+        oauth2Client.setCredentials({
+            refresh_token:refresh_token
+        })
+
+        const calendar = google.calendar({version:'v3' , auth:oauth2Client})
+
+        const response = await calendar.events.list({
+            calendarId:'primary',
+        })
+        res.status(response.status).json(response.data.items);
+    }
+    catch(err)
+    {
+        if(err instanceof jwt.JsonWebTokenError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof VerifyError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof Error)
+        {
+            res.status(400).json(err.message);
+        }
+        else
+        {
+            res.status(err.response.status).json(err.message)
+        }
+    }
+
+
+
+
+
+})
 
 
 

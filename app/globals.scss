@@ -24,22 +24,23 @@
     }
 }
 
-.openme{
-    animation-name: openmenu;
-    animation-duration: 0.1s;
+
+.not-open{
+    flex: 0;
+    width: 0%;
+    transition: 500ms;
 }
 
-.closeme{
-    animation-name: closemenu;
-    animation-duration: 0.25s;
+.active{
+    flex: 0.2;
 }
 
-@keyframes openmenu {
-    From{opacity: 0; width: 0%;}
-    To{opacity: 1;  width: 100%;}
+.mobile-menu{
+    right: 100%;
+    transition: 0.3s;
+    flex: 0;
 }
 
-@keyframes closemenu {
-    From{opacity: 1; width: 100%;}
-    To{opacity: 0; width: 0%;}
+.mobile-menu.mbac{
+    right: 0;
 }
