@@ -38,8 +38,10 @@ const Menu = () => {
     try
     {
       const response = await axios.post('/api/calendar/operations/create-event',event)
-      await document.getElementById('eventForms').reset();
+      document.getElementById('eventForms').reset();
       setLoad(false);
+      console.log(response);
+      EventForm.reset();
     }
     catch(err)
     {
@@ -53,9 +55,10 @@ const Menu = () => {
     try
     {
       const response = await axios.post('/api/calendar/operations/create-birthday',event)
-      await document.getElementById('birthdayForms').reset();
+      document.getElementById('birthdayForms').reset();
       setLoad(false);
       console.log(response.data);
+      BirthdayForm.reset();
     }
     catch(err)
     {
@@ -166,7 +169,7 @@ const Menu = () => {
             {BirthdayForm.formState.errors.birthdaydescription && <p className='text-sm w-full text-red-600 mb-3'>Some description required!</p>}
 
             <label className='bg-white text-sm' htmlFor="dateofbirth">Date Of Birth : </label>
-            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="date" defaultValue='2023-01-01' className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
+            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="datetime-local" defaultValue={'2023-01-01T12:00'}className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
             {BirthdayForm.formState.errors.dateofbirth && <p className='text-sm w-full text-red-600 mb-3'>Date of Birth required!</p>}
             <button className='w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Birthday</button>
           </form>

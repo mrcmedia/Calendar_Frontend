@@ -1,7 +1,7 @@
 const { default: axios } = require('axios');
 const express = require('express')
 const {google} = require('googleapis')
-const { base64decode } = require('nodejs-base64');
+const { base64decode, base64encode } = require('nodejs-base64');
 const config = require('config')
 const cookie = require('cookie')
 const jwt = require('jsonwebtoken')
@@ -39,12 +39,7 @@ function Verrify(request)
             if(auth_cookie)
             {
                 const email = jwt.verify(auth_cookie , process.env.JWT_SECRET).email
-
-                var startDate = new Date(dateofbirth);
-                var endDate = new Date();
-                endDate.setTime(startDate.getTime() +  60 * 60 * 1000)
-
-                return {summary:birthdayPerson , description:birthdaydescription , startDate , endDate , location , email , location:'Pitipana Homagama, Sri Lanka'};
+                return {summary:birthdayPerson , description:birthdaydescription , startDate:dateofbirth , endDate:dateofbirth , location , email , location:'Pitipana Homagama, Sri Lanka'};
             }
             else{
                 throw new VerifyError('Cookie error')
@@ -87,12 +82,17 @@ router.post('/create-event', async (req,res) => {
 
         const calendar = google.calendar({version:'v3' , auth:oauth2Client})
 
+        const bas64Description = base64encode(JSON.stringify({
+            type:"Event",
+            description:description
+        }))
+
         const response = await calendar.events.insert({
             calendarId:'primary',
             requestBody:{
                 summary:summary,
                 location:location,
-                description:description,
+                description:bas64Description,
                 start:{
                     dateTime:new Date(startDate)
                 },
@@ -147,17 +147,22 @@ router.post('/create-birthday', async (req,res) => {
 
         const calendar = google.calendar({version:'v3' , auth:oauth2Client})
 
+        const bas64Description = base64encode(JSON.stringify({
+            type:"Birthday",
+            description:description
+        }))
+
         const response = await calendar.events.insert({
             calendarId:'primary',
             requestBody:{
                 summary:summary,
                 location:location,
-                description:description,
+                description:bas64Description,
                 start:{
-                    dateTime:startDate
+                    dateTime:new Date(Date.parse(startDate))
                 },
                 end:{
-                    dateTime:endDate
+                    dateTime:new Date(Date.parse(endDate))
                 },
                 colorId:Math.floor(Math.random() * 12)
             }
@@ -207,7 +212,8 @@ router.get('/get-events' , async (req,res) => {
         const response = await calendar.events.list({
             calendarId:'primary',
         })
-        res.status(response.status).json(response.data.items);
+        res.status(response.status).json(response.data);
+        
     }
     catch(err)
     {

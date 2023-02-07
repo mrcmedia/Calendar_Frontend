@@ -1,31 +1,48 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Oval, RotatingLines } from 'react-loader-spinner';
 import BirthdayContainer from './BirthdayContainer'
 import EventContainer from './EventContainer'
+import { deleteCookie } from 'cookies-next';
+import { base64decode } from 'nodejs-base64';
 
+
+async function GetData(){
+  try
+  {
+    const response = await axios.get('/api/calendar/operations/get-events');
+    return response.data.items;
+  }
+  catch(err)
+  {
+    console.error(err.response);
+  }
+};
 
 
 const Container = () => {
 
+  const Timer = useRef();
+  const TimeOut = useRef();
+
   const [data , setData] = useState([]);
+  const [isload , setIsload] = useState(true);
+  const [isBuffer , setIsBuffer] = useState(false);
 
   useEffect(() => {
-    setData([]);
-    async function GetData(){
-      const response = await axios.get('/api/calendar/operations/get-events');
-      setData(response.data);
-    };
-    GetData();
-  
-  },[])
-
-  useEffect(() => {
-    data.map((items)=> {
-      console.log(items.start);
-    })
-  },[data])
-  
+    if(isload)
+    {
+      setIsBuffer(true);
+      async function get()
+      {
+        setData(await GetData())
+        setIsBuffer(false);
+      }
+      get()
+      setIsload(false);
+    }
+  })
+   
   return (
     <div className='w-full h-fit md:h-full relative sm:flex block md:flex-row flex-col'>
       <div className='md:flex-1 md:h-full h-fit w-full overflow-y-hidden sm:overflow-y-scroll'>
@@ -35,17 +52,21 @@ const Container = () => {
             {
               data.length > 0 ? 
               data.map((items) => {
-                  return(
-                    <EventContainer
-                    summary={items.summary}
-                    description={items.description}
-                    stDate={new Date(items.start.dateTime).toLocaleString()}
-                    endDate={new Date(items.end.dateTime).toLocaleString()}
-                    />
-                  )
+                  if(JSON.parse(base64decode(items.description)).type === "Event")
+                  {
+                    return(
+                      <EventContainer key={items.id}
+                      location={items.location}
+                      summary={items.summary}
+                      description={JSON.parse(base64decode(items.description)).description}
+                      stDate={new Date(items.start.dateTime).toLocaleString()}
+                      endDate={new Date(items.end.dateTime).toLocaleString()}
+                      />
+                    )
+                  }
                 })
-              : 
-                  <span className='fixed lg:absolute bg-white lg:bg-none  top-0 left-0 space-x-5 right-0 bottom-0 flex items-center justify-center '>
+              : isBuffer ? 
+              <span className='fixed lg:absolute bg-white lg:bg-none  top-0 left-0 space-x-5 right-0 bottom-0 flex items-center justify-center '>
                   <Oval
                     height={30}
                     width={30}
@@ -60,16 +81,29 @@ const Container = () => {
                   />
                   <p>Loading ...</p>
               </span>
+              : <span className='fixed lg:absolute bg-white lg:bg-none  top-0 left-0 space-x-5 right-0 bottom-0 flex items-center justify-center '>
+                <h1 className='text-3xl '> oops! Nothing to see here !</h1>
+              </span>
             }
         </div>
       </div>
       <div className='lg:flex-[0.3] md:flex-[0.5] shadow-2xl sm:h-full h-fit overflow-y-hidden sm:overflow-y-scroll'>
         <h1 className='shadow-md shadow-slate-400 py-5 px-3 bg-blue-600 text-white text-xl'>Birthdays for the day</h1>
-        <BirthdayContainer/>
-        <BirthdayContainer/>
-        <BirthdayContainer/>
-        <BirthdayContainer/>
-        <BirthdayContainer/>
+        {
+          data.map(({description , summary , id , start}) => {
+
+            if(JSON.parse(base64decode(description)).type === "Birthday")
+            {
+              return(
+                <BirthdayContainer key={id}
+                summary={summary}
+                description={JSON.parse(base64decode(description)).description}
+                stDate={new Date(start.dateTime).toDateString()}
+                />
+              )
+            }
+          })
+        }
       </div>
     </div>
   )
