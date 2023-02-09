@@ -52,17 +52,35 @@ const Container = () => {
             {
               data.length > 0 ? 
               data.map((items) => {
-                  if(JSON.parse(base64decode(items.description)).type === "Event")
+                  try
                   {
-                    return(
-                      <EventContainer key={items.id}
-                      location={items.location}
-                      summary={items.summary}
-                      description={JSON.parse(base64decode(items.description)).description}
-                      stDate={new Date(items.start.dateTime).toLocaleString()}
-                      endDate={new Date(items.end.dateTime).toLocaleString()}
-                      />
-                    )
+                    if(JSON.parse(base64decode(items.description)).type === "Event")
+                    {
+                      return(
+                        <EventContainer key={items.id}
+                        location={items.location}
+                        summary={items.summary}
+                        description={JSON.parse(base64decode(items.description)).description}
+                        stDate={new Date(items.start.dateTime).toLocaleString()}
+                        endDate={new Date(items.end.dateTime).toLocaleString()}
+                        id={items.id}
+                        />
+                      )
+                    }
+                  }
+                  catch(err)
+                  {
+                    if(err instanceof SyntaxError)
+                    {
+                      return(
+                        <span className='fixed lg:absolute text-center flex-col bg-slate-200 lg:bg-none  top-0 left-0 space-x-5 right-0 bottom-0 flex items-center justify-center '>
+                          <h1 className='text-5xl mb-5'> Runtime Error!</h1>
+                          <p>please use this website for custormize calendar todos </p>
+                          <p className='text-xs'>Note : you have to delete all events that submitted from standard google calendar to use this website</p>
+                          <p className='text-xs'>Recomended : setup new google account</p>
+                        </span>
+                      )
+                    }
                   }
                 })
               : isBuffer ? 
@@ -92,15 +110,32 @@ const Container = () => {
         {
           data.map(({description , summary , id , start}) => {
 
-            if(JSON.parse(base64decode(description)).type === "Birthday")
+            try
             {
-              return(
-                <BirthdayContainer key={id}
-                summary={summary}
-                description={JSON.parse(base64decode(description)).description}
-                stDate={new Date(start.dateTime).toDateString()}
-                />
-              )
+              if(JSON.parse(base64decode(description)).type === "Birthday")
+              {
+                return(
+                  <BirthdayContainer key={id}
+                  summary={summary}
+                  description={JSON.parse(base64decode(description)).description}
+                  stDate={new Date(start.dateTime).toDateString()}
+                  />
+                )
+              }
+            }
+            catch(err)
+            {
+              if(err instanceof SyntaxError)
+              {
+                return(
+                  <span className='fixed lg:absolute text-center bg-slate-200 lg:bg-none flex-col top-0 left-0 p-5 right-0 bottom-0 flex items-center justify-center '>
+                    <h1 className='text-4xl mb-1 md:mb-5'> Runtime Error!</h1>
+                    <p className='mb-5 md:mb-0'>please use this website for custormize calendar todos </p>
+                    <p className='text-xs'>Note : you have to delete all events that submitted from standard google calendar to use this website</p>
+                    <p className='text-xs'>Recomended : setup new google account</p>
+                  </span>
+                )
+              }
             }
           })
         }

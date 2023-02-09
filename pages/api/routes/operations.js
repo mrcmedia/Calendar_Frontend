@@ -235,11 +235,72 @@ router.get('/get-events' , async (req,res) => {
         }
     }
 
+})
 
+router.get('/update-events' , async (req,res) => {
 
+    try
+    {
+        const {email} = Verrify(req);
+        const rt = await axios.get(`${config.get('git_url')}/${email}`,
+        {
+            headers:{
+            "Authorization":`${process.env.GITPA_TOKEN}`,
+            "Content-Type":"application/json"
+            }
+        });
+        const refresh_token = base64decode(rt.data.content)
+        oauth2Client.setCredentials({
+            refresh_token:refresh_token
+        })
 
+        
+        const calendar = google.calendar({version:'v3' , auth:oauth2Client})
+
+        const response = await calendar.events.update({
+            calendarId:'primary',
+            eventId:"6jqfe7h6rrur0utrmfh3jlfpu0",
+            requestBody:{
+                summary:"Hello world",
+                location:"Asia, Colombo",
+                description:"adooo machang",
+                start:{
+                    dateTime:new Date()
+                },
+                end:{
+                    dateTime:new Date()
+                },
+                colorId:Math.floor(Math.random() * 12)
+            }
+        })
+        res.status(response.status).json(response.data);
+        
+    }
+    catch(err)
+    {
+        if(err instanceof jwt.JsonWebTokenError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof VerifyError)
+        {
+            res.status(400).json(err.message);
+        }
+        else if(err instanceof Error)
+        {
+            res.status(400).json(err.message);
+        }
+        else
+        {
+            res.status(err.response.status).json(err.message)
+        }
+    }
 
 })
+
+
+
+
 
 
 
