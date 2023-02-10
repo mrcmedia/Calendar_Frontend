@@ -44,3 +44,12 @@
 .mobile-menu.mbac{
     right: 0;
 }
+
+.delete-popup{
+    scale: 0;
+    transition: 300ms;
+}
+
+.delete-popup.activepop{
+    scale: 1;
+}

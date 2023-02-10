@@ -45,6 +45,7 @@ const Container = () => {
    
   return (
     <div className='w-full h-fit md:h-full relative sm:flex block md:flex-row flex-col'>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
       <div className='md:flex-1 md:h-full h-fit w-full overflow-y-hidden sm:overflow-y-scroll'>
         <h1 className='text-3xl bg-white-600 block lg:relative  bg-white shadow-md p-4'>Events for the day</h1>
         <div className='w-full h-fit'>
@@ -64,6 +65,7 @@ const Container = () => {
                         stDate={new Date(items.start.dateTime).toLocaleString()}
                         endDate={new Date(items.end.dateTime).toLocaleString()}
                         id={items.id}
+                        type="Event"
                         />
                       )
                     }
@@ -99,8 +101,9 @@ const Container = () => {
                   />
                   <p>Loading ...</p>
               </span>
-              : <span className='fixed lg:absolute bg-white lg:bg-none  top-0 left-0 space-x-5 right-0 bottom-0 flex items-center justify-center '>
-                <h1 className='text-3xl '> oops! Nothing to see here !</h1>
+              : <span className='fixed lg:absolute bg-slate-200 lg:bg-none flex-col space-y-5  top-0 left-0 space-x-5 right-0 bottom-0 flex items-center justify-center '>
+                <h1 className='text-5xl'><i className="fa fa-bullhorn" aria-hidden="true"></i></h1>
+                <h1 className='text-3xl '>Nothing to see here !</h1>
               </span>
             }
         </div>
@@ -119,6 +122,8 @@ const Container = () => {
                   summary={summary}
                   description={JSON.parse(base64decode(description)).description}
                   stDate={new Date(start.dateTime).toDateString()}
+                  id={id}
+                  type="Birthday"
                   />
                 )
               }
