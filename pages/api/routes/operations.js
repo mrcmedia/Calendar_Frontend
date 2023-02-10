@@ -237,12 +237,13 @@ router.get('/get-events' , async (req,res) => {
 
 })
 
-router.get('/update-events' , async (req,res) => {
+router.post('/update-event' , async (req,res) => {
 
     try
     {
         if(req.query.id === undefined) throw new Error("invalid queries")
-        const {email} = Verrify(req);
+        if(req.query.type === undefined) throw new Error("invalid queries")
+        const {summary , description , startDate , endDate ,location , email} = Verrify(req);
         const rt = await axios.get(`${config.get('git_url')}/${email}`,
         {
             headers:{
@@ -258,24 +259,40 @@ router.get('/update-events' , async (req,res) => {
         
         const calendar = google.calendar({version:'v3' , auth:oauth2Client})
 
+        let bas64Description;
+
+        if(req.query.type === "Event")
+        {
+            bas64Description = base64encode(JSON.stringify({
+                type:"Event",
+                description:description
+            }))
+        }
+        else if(req.query.type === "Birthday")
+        {
+            bas64Description = base64encode(JSON.stringify({
+                type:"Birthday",
+                description:description
+            }))
+        }
+
         const response = await calendar.events.update({
             calendarId:'primary',
             eventId:req.query.id,
             requestBody:{
-                summary:"Hello world",
-                location:"Asia, Colombo",
-                description:"adooo machang",
+                summary:summary,
+                location:location,
+                description:bas64Description,
                 start:{
-                    dateTime:new Date()
+                    dateTime:new Date(startDate)
                 },
                 end:{
-                    dateTime:new Date()
+                    dateTime:new Date(endDate)
                 },
                 colorId:Math.floor(Math.random() * 12)
             }
         })
         res.status(response.status).json(response.data);
-        
     }
     catch(err)
     {

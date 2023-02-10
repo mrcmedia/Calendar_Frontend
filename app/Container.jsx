@@ -3,8 +3,9 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Oval, RotatingLines } from 'react-loader-spinner';
 import BirthdayContainer from './BirthdayContainer'
 import EventContainer from './EventContainer'
-import { deleteCookie } from 'cookies-next';
+import { deleteCookie , getCookie } from 'cookies-next';
 import { base64decode } from 'nodejs-base64';
+import { getDate } from '@/utils/GetDateTimeString';
 
 
 async function GetData(){
@@ -42,9 +43,11 @@ const Container = () => {
       setIsload(false);
     }
   })
+  
+  
    
   return (
-    <div className='w-full h-fit md:h-full relative sm:flex block md:flex-row flex-col'>
+    <div id='container-ev' className='w-full h-fit md:h-full relative sm:flex block md:flex-row flex-col'>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
       <div className='md:flex-1 md:h-full h-fit w-full overflow-y-hidden sm:overflow-y-scroll'>
         <h1 className='text-3xl bg-white-600 block lg:relative  bg-white shadow-md p-4'>Events for the day</h1>
@@ -57,17 +60,34 @@ const Container = () => {
                   {
                     if(JSON.parse(base64decode(items.description)).type === "Event")
                     {
-                      return(
-                        <EventContainer key={items.id}
-                        location={items.location}
-                        summary={items.summary}
-                        description={JSON.parse(base64decode(items.description)).description}
-                        stDate={new Date(items.start.dateTime).toLocaleString()}
-                        endDate={new Date(items.end.dateTime).toLocaleString()}
-                        id={items.id}
-                        type="Event"
-                        />
-                      )
+                      if(getCookie('today-filter') === false && getCookie('filter-date-From') && new Date(Date.parse(items.start.dateTime)) >= new Date(Date.parse(getCookie('filter-date-From'))) && new Date(Date.parse(items.start.dateTime)) <= new Date(Date.parse(getCookie('filter-date-To'))))
+                      {
+                        return(
+                          <EventContainer key={items.id}
+                          location={items.location}
+                          summary={items.summary}
+                          description={JSON.parse(base64decode(items.description)).description}
+                          stDate={new Date(items.start.dateTime).toLocaleString()}
+                          endDate={new Date(items.end.dateTime).toLocaleString()}
+                          id={items.id}
+                          type="Event"
+                          />
+                        )
+                      }
+                      else if(getCookie('today-filter') === true && getDate(new Date()) === getDate(new Date(Date.parse(items.start.dateTime))))
+                      {
+                        return(
+                          <EventContainer key={items.id}
+                          location={items.location}
+                          summary={items.summary}
+                          description={JSON.parse(base64decode(items.description)).description}
+                          stDate={new Date(items.start.dateTime).toLocaleString()}
+                          endDate={new Date(items.end.dateTime).toLocaleString()}
+                          id={items.id}
+                          type="Event"
+                          />
+                        )
+                      }
                     }
                   }
                   catch(err)
@@ -82,6 +102,10 @@ const Container = () => {
                           <p className='text-xs'>Recomended : setup new google account</p>
                         </span>
                       )
+                    }
+                    else
+                    {
+                      console.log('error' , err.message)
                     }
                   }
                 })
@@ -117,15 +141,31 @@ const Container = () => {
             {
               if(JSON.parse(base64decode(description)).type === "Birthday")
               {
-                return(
-                  <BirthdayContainer key={id}
-                  summary={summary}
-                  description={JSON.parse(base64decode(description)).description}
-                  stDate={new Date(start.dateTime).toDateString()}
-                  id={id}
-                  type="Birthday"
-                  />
-                )
+                if(getCookie('today-filter') === false && getCookie('filter-date-From') && new Date(Date.parse(start.dateTime)) >= new Date(Date.parse(getCookie('filter-date-From'))) && new Date(Date.parse(start.dateTime)) <= new Date(Date.parse(getCookie('filter-date-To'))))
+                {
+                    return(
+                    <BirthdayContainer key={id}
+                    summary={summary}
+                    description={JSON.parse(base64decode(description)).description}
+                    stDate={new Date(start.dateTime).toDateString()}
+                    id={id}
+                    type="Birthday"
+                    />
+                  )
+                }
+                else if(getCookie('today-filter') === true && getDate(new Date()) === getDate(new Date(Date.parse(start.dateTime))))
+                {
+                  return(
+                    <BirthdayContainer key={id}
+                    summary={summary}
+                    description={JSON.parse(base64decode(description)).description}
+                    stDate={new Date(start.dateTime).toDateString()}
+                    id={id}
+                    type="Birthday"
+                    />
+                  )
+                }
+                
               }
             }
             catch(err)
@@ -141,7 +181,12 @@ const Container = () => {
                   </span>
                 )
               }
+              else
+              {
+                console.log(err.message)
+              }
             }
+
           })
         }
       </div>

@@ -4,12 +4,14 @@ import { useForm } from 'react-hook-form';
 import Clock from 'react-live-clock';
 import { RotatingLines } from 'react-loader-spinner';
 const SriLanka = require('get-srilanka-districts-cities');
+import { getDate  , getDateTime} from '@/utils/GetDateTimeString';
+import {setCookie , getCookie} from 'cookies-next';
 
 
 const Menu = () => {
 
     const [Load, setLoad] = useState(false);
-  const [customFilter, setCustomFilter] = useState(true);
+  const [customFilter, setCustomFilter] = useState(getCookie('today-filter') || false);
 
   const [date] = useState(new Date().toLocaleString("en-LK", {timeZone: "Asia/Colombo", dateStyle:'long'}));
   const [DayOfWeek] = useState(new Date().toLocaleString("en-LK", {timeZone: "Asia/Colombo", weekday:'long'}));
@@ -20,6 +22,8 @@ const Menu = () => {
   const BirthdayForm = useForm();
 
   const [SlCities, setSlCities] = useState([])
+  const [dates , setDates] = useState('');
+  const [datesTimes , setDatesTimes] = useState('');
 
   useEffect(() => {
     async function get()
@@ -32,6 +36,10 @@ const Menu = () => {
     get();
   }, [])
 
+  useEffect(() => {
+    setDates(getDate(new Date(Date.parse(date))))
+    setDatesTimes(getDateTime(new Date()))
+  },[])
 
   const handleEventSubmit = async (event) => {
     setLoad(true);
@@ -83,8 +91,14 @@ const Menu = () => {
   }, [SlCities])
 
 
+  const HandleFilter = (event) => {
+    setCookie(event.target.name, event.target.value , {maxAge: 60 * 6 * 24});
+  }
 
-
+  const HandleFilterChecked = (event) => {
+    setCookie(event.target.name, event.target.checked , {maxAge: 60 * 6 * 24});
+    setCustomFilter(event.target.checked)
+  }
 
   return (
     <div className='mt-11 sm:mt-12 shadow-2xl pb-10 md:pb-0 overflow-scroll'>
@@ -107,15 +121,16 @@ const Menu = () => {
         <section className='p-3 w-full'>
             <h2 className='text-lg'>Filters</h2>
             <section className='flex relative space-x-2 items-center'>
-              <input checked={customFilter} onChange={(e) => {setCustomFilter(e.target.checked)}} id='today-filter' name='today-filter' className='relative outline-none bottom-[1px]' type="checkbox"/>
+              <input checked={customFilter} onChange={HandleFilterChecked} id='today-filter' name='today-filter' className='relative outline-none bottom-[1px]' type="checkbox"/>
               <label className='cursor-pointer' htmlFor="today-filter">Realtime Events And Birthdays</label>
             </section>
             {!customFilter && <section className='flex flex-col'>
               <label htmlFor="datefrom">From :</label>
-              <input defaultValue={'2023-01-01'} className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' type="date" id='datefrom' />
+              <input defaultValue={getCookie('filter-date-From') ? getCookie('filter-date-From') : dates } name={'filter-date-From'} onChange={HandleFilter} className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' type="date" id='datefrom' />
 
               <label htmlFor="datefrom">To :</label>
-              <input defaultValue={'2023-01-01'} className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' type="date" id='datefrom' />
+              <input defaultValue={getCookie('filter-date-To') ? getCookie('filter-date-To') : dates } name={'filter-date-To'} onChange={HandleFilter} className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' type="date" id='dateTo' />
+
             </section>}
           </section>
         <section className='py-5 w-full shadow-md bg-slate-50'>
@@ -130,11 +145,11 @@ const Menu = () => {
             {EventForm.formState.errors.description && <p className='text-sm w-full text-red-600 mb-3'>Description about event required!</p>}
 
             <label className='bg-white text-sm' htmlFor="startDate">Start Date & Time : </label>
-            <input {...EventForm.register('startDate', {required:true})}  name='startDate' defaultValue={'2023-01-01T12:00'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
+            <input {...EventForm.register('startDate', {required:true})}  name='startDate' defaultValue={datesTimes} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
             {EventForm.formState.errors.startDate && <p className='text-sm w-full text-red-600 mb-3'>Starting Date required!</p>}
 
             <label className='bg-white text-sm' htmlFor="endDate">End Date & Time : </label>
-            <input {...EventForm.register('endDate', {required:true})} name='endDate' defaultValue={'2023-01-01T12:00'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
+            <input {...EventForm.register('endDate', {required:true})} name='endDate' defaultValue={datesTimes} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
             {EventForm.formState.errors.endDate && <p className='text-sm w-full text-red-600 mb-3'>Ending Date required!</p>}
 
             <label className='bg-white text-sm' htmlFor="location">Location :</label>
@@ -169,7 +184,7 @@ const Menu = () => {
             {BirthdayForm.formState.errors.birthdaydescription && <p className='text-sm w-full text-red-600 mb-3'>Some description required!</p>}
 
             <label className='bg-white text-sm' htmlFor="dateofbirth">Date Of Birth : </label>
-            <input {...BirthdayForm.register('dateofbirth', {required:true})}  name='dateofbirth' type="datetime-local" defaultValue={'2023-01-01T12:00'}className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
+            <input {...BirthdayForm.register('dateofbirth', {required:true})} defaultValue={dates}  name='dateofbirth' type="date" className=' outline-slate-200 mb-3 bg-white outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='dateofbirth' />
             {BirthdayForm.formState.errors.dateofbirth && <p className='text-sm w-full text-red-600 mb-3'>Date of Birth required!</p>}
             <button className='w-full p-2 bg-blue-600 text-white rounded-sm hover:bg-blue-500 active:bg-blue-700'>Add Birthday</button>
           </form>

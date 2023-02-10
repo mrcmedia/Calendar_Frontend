@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { RotatingLines } from 'react-loader-spinner';
 
-const BirthdayContainer = ({summary , stDate , description , id}) => {
+const BirthdayContainer = ({summary , stDate , description , id , type}) => {
 
 
   const [isDelete , setIsDelete] = useState(false);
@@ -62,8 +62,8 @@ const BirthdayContainer = ({summary , stDate , description , id}) => {
           </div>
       </div>
       <div className='flex justify-between shadow-md w-full bg-slate-50'>
-        <button className='text-xs w-fit hover:bg-blue-600 rounded-tr hover:text-white transition duration-200 p-2'><i className="fa fa-edit pr-1" aria-hidden="true"></i>Update</button>
-        <button className='text-xs w-fit hover:bg-red-600 rounded-tl hover:text-white transition  duration-200 p-2' onClick={handleDelete}><i className="fa fa-eraser pr-1 " aria-hidden="true"></i>Delete</button>
+        <button className='text-xs w-fit hover:bg-blue-600 rounded-tr hover:text-white transition duration-200 p-2' onClick={() => {window.location.href = `/Update?id=${id}&type=${type}&summary=${summary}&description=${description}&startDate=${stDate}`}}><i className="fa fa-edit pr-1" aria-hidden="true"></i>Update</button>
+        <button className='text-xs w-fit hover:bg-red-600 rounded-tl hover:text-white transition  duration-200 p-2' onClick={handleDelete}><i className="fa fa-eraser pr-1" aria-hidden="true"></i>Delete</button>
       </div>
 
       {isDelete && (
@@ -71,7 +71,7 @@ const BirthdayContainer = ({summary , stDate , description , id}) => {
             <div className='w-[200px] p-3 bg-white rounded-lg'>
               <h1 className='text-lg text-red-500'>Delete</h1>
               <p className='text-xs'>Do you want to delete this?</p>
-              <button onClick={HandleDelete} className='relative w-full bg-red-600 text-white p-1 rounded-sm mt-2'><i className="fa fa-trash pr-1" 
+              <button onClick={HandleDelete} className='relative w-full bg-red-600 hover:bg-red-500 text-white p-1 rounded-sm mt-2'><i className="fa fa-trash pr-1" 
               aria-hidden="true"></i>Delete
               
               {isLoad && <span className='absolute bg-red-700 top-0 left-0 right-0 bottom-0 flex items-center justify-center'>

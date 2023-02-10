@@ -27,6 +27,7 @@ const EventContainer = ({summary , description , stDate , location , endDate , i
     {
       document.getElementById(id).classList.remove('activepop');
       document.getElementById(id).removeEventListener('click' , closeDeletePop)
+      
       setTimeout(() => {
         setIsDelete(false);
       },[300])
@@ -48,7 +49,6 @@ const EventContainer = ({summary , description , stDate , location , endDate , i
     }
 
   })
-
 
   return (
     <div className='w-full mt-5 flex flex-col relative items-center sm:bg-slate-50 bg-slate-50 shadow-md'>
@@ -73,7 +73,7 @@ const EventContainer = ({summary , description , stDate , location , endDate , i
             <div className='w-[200px] p-3 bg-white rounded-lg'>
               <h1 className='text-lg text-red-500'>Delete</h1>
               <p className='text-xs'>Do you want to delete this?</p>
-              <button onClick={HandleDelete} className='relative w-full bg-red-600 text-white p-1 rounded-sm mt-2'><i className="fa fa-trash pr-1" 
+              <button onClick={HandleDelete} className='relative w-full hover:bg-red-500 bg-red-600 text-white p-1 rounded-sm mt-2'><i className="fa fa-trash pr-1" 
               aria-hidden="true"></i>Delete
               
 
