@@ -4,15 +4,33 @@ import { useForm } from 'react-hook-form';
 import Header from '../Header';
 const SriLanka = require('get-srilanka-districts-cities');
 
-const page = ({searchParams:{id , type}}) => {
+const page = ({searchParams:{id , type , summary , description , startDate , endDate , location}}) => {
 
   const EventForm = useForm();
   const [SlCities, setSlCities] = useState([])
+  const [dates ,setdates ] = useState('');
 
   const handleBack = (event) => {
     event.preventDefault();
     window.location.href = "/";
   }
+
+  const getDateTime = (d) => {
+    // const d =  new Date(Date.parse(startDate))
+    const year = (d.getFullYear()).toString();
+    const month = ((d.getMonth()) + 101).toString().slice(-2);
+    const date = ((d.getDate()) + 100).toString().slice(-2);
+
+    const hours = ((d.getHours()) + 100).toString().slice(-2);
+    const mins = ((d.getMinutes()) + 100).toString().slice(-2);
+
+    return `${year}-${month}-${date}T${hours}:${mins}`;
+  }
+
+  useEffect(() => {
+    document.getElementById('startDate').defaultValue = getDateTime(new Date(Date.parse(startDate)));
+    document.getElementById('endDate').defaultValue = getDateTime(new Date(Date.parse(endDate)));
+  },[])
 
   const handleEventSubmit = async (event) => {
     console.log(event)
@@ -52,23 +70,23 @@ const page = ({searchParams:{id , type}}) => {
           <div className='w-[90%] md:w-1/2 rounded-sm xl:w-1/4 h-fit  bg-slate-50 p-4 drop-shadow-xl'>
             <form id='eventForms' onSubmit={EventForm.handleSubmit(handleEventSubmit)} className='w-full md:w-[90%] mx-auto'>
               <label className='text-sm' htmlFor="summary">Summary :</label>
-              <input name='summary' {...EventForm.register('summary', {required:true})} placeholder='Summary' type="text" className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' id='summary' />
+              <input defaultValue={summary} name='summary' {...EventForm.register('summary', {required:true})} placeholder='Summary' type="text" className='bg-white outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 mb-3 outline-1 p-1 px-3 text-sm' id='summary' />
               {EventForm.formState.errors.summary && <p className='text-sm w-full text-red-600 mb-3'>summary required! (this is like a title)</p>}
   
               <label className='  text-sm' htmlFor="description">Description :</label>
-              <textarea {...EventForm.register('description', {required:true})} name='description' placeholder='Description' className='bg-white outline-slate-200 mb-3 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='description' />
+              <textarea defaultValue={description} {...EventForm.register('description', {required:true})} name='description' placeholder='Description' className='bg-white outline-slate-200 mb-3 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='description' />
               {EventForm.formState.errors.description && <p className='text-sm w-full text-red-600 mb-3'>Description about event required!</p>}
   
               <label className='text-sm' htmlFor="startDate">Start Date & Time : </label>
-              <input {...EventForm.register('startDate', {required:true})}  name='startDate' defaultValue={'2023-01-01T12:00'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
+              <input {...EventForm.register('startDate', {required:true})}  name='startDate' type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='startDate' />
               {EventForm.formState.errors.startDate && <p className='text-sm w-full text-red-600 mb-3'>Starting Date required!</p>}
   
               <label className='text-sm' htmlFor="endDate">End Date & Time : </label>
-              <input {...EventForm.register('endDate', {required:true})} name='endDate' defaultValue={'2023-01-01T12:00'} type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
+              <input {...EventForm.register('endDate', {required:true})} name='endDate' type="datetime-local" className='bg-white mb-3 outline-slate-200 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id='endDate' />
               {EventForm.formState.errors.endDate && <p className='text-sm w-full text-red-600 mb-3'>Ending Date required!</p>}
   
               <label className='text-sm' htmlFor="location">Location :</label>
-              <select defaultValue='Pitipana Homagama, Sri Lanka' {...EventForm.register('location', {required:true})} name='location' className='bg-white outline-slate-200 mb-3 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id="location">
+              <select defaultValue={location} {...EventForm.register('location', {required:true})} name='location' className='bg-white outline-slate-200 mb-3 outline rounded-sm w-full transition-shadow mt-1 focus:shadow-sm focus:outline-blue-500 outline-1 p-1 px-3 text-sm' id="location">
               <option value={'Pitipana Homagama, Sri Lanka'}>Pitipana Homagama, Sri Lanka</option>
                 {SlCities.length > 0 && SlCities.map((itemss) => {
                   return (<option key={`${Math.random()} ${itemss} `} value={`${itemss}, Sri Lanka`}>{itemss}, Sri Lanka</option>)

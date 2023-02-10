@@ -64,7 +64,7 @@ const EventContainer = ({summary , description , stDate , location , endDate , i
             <p>{description}</p>
         </div>
         <div className='flex justify-between w-full'>
-          <button className='text-xs w-fit hover:bg-blue-600 rounded-tr hover:text-white transition duration-200 p-2' onClick={() => {window.location.href = `/Update?id=${id}&type=${type}`}}><i className="fa fa-edit pr-1" aria-hidden="true"></i>Update</button>
+          <button className='text-xs w-fit hover:bg-blue-600 rounded-tr hover:text-white transition duration-200 p-2' onClick={() => {window.location.href = `/Update?id=${id}&type=${type}&summary=${summary}&description=${description}&startDate=${stDate}&endDate=${endDate}&location=${location}`}}><i className="fa fa-edit pr-1" aria-hidden="true"></i>Update</button>
           <button onClick={handleDelete} className='text-xs w-fit hover:bg-red-600 rounded-tl hover:text-white transition duration-200 p-2'><i className="fa fa-eraser pr-1 " aria-hidden="true"></i>Delete</button>
         </div>
 
