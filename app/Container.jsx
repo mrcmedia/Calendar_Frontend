@@ -5,8 +5,7 @@ import BirthdayContainer from './BirthdayContainer'
 import EventContainer from './EventContainer'
 import { deleteCookie , getCookie } from 'cookies-next';
 import { base64decode } from 'nodejs-base64';
-import { getDate } from '@/utils/GetDateTimeString';
-
+import { getDate, getDateTime } from '@/utils/GetDateTimeString';
 
 async function GetData(){
   try
@@ -23,8 +22,7 @@ async function GetData(){
 
 const Container = () => {
 
-  const Timer = useRef();
-  const TimeOut = useRef();
+  // const workerRef =useRef();
 
   const [data , setData] = useState([]);
   const [isload , setIsload] = useState(true);
@@ -38,18 +36,42 @@ const Container = () => {
       {
         setData(await GetData())
         setIsBuffer(false);
+        // workerRef.current.postMessage('starting ...');
       }
       get()
       setIsload(false);
     }
-  })
+  },[])
+
+  useEffect(()=> {
+    // if(workerRef.current !== new Worker(new URL('../utils/Worker.js', import.meta.url)))
+    // {
+    //   workerRef.current =  new Worker(new URL('../utils/Worker.js', import.meta.url))
+    // }
+    // workerRef.current.onmessage = (message) => {
+    //   if(data.length > 0 && message.data === "go on")
+    //   {
+    //     console.log('calling')
+    //     data.map(({start:dateTime}) => {
+    //       if(getDateTime(new Date(dateTime.dateTime)) === getDateTime(new Date()))
+    //       {
+    //         console.log(`${new Date()} jus came`);
+    //       }
+    //     })
+    //   }
+    // }
+
+    return (()=> {
+      // workerRef.current.terminate(0);
+    })
+  },[data])
   
   
    
   return (
-    <div id='container-ev' className='w-full h-fit md:h-full relative sm:flex block md:flex-row flex-col'>
+    <div className='w-full h-fit md:h-full relative sm:flex block md:flex-row flex-col'>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"></link>
-      <div className='md:flex-1 md:h-full h-fit w-full overflow-y-hidden sm:overflow-y-scroll'>
+      <div id='container-ev' className='md:flex-1 md:h-full h-fit w-full overflow-y-hidden sm:overflow-y-scroll'>
         <h1 className='text-3xl bg-white-600 block lg:relative  bg-white shadow-md p-4'>Events for the day</h1>
         <div className='w-full h-fit'>
             

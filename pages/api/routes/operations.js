@@ -39,7 +39,7 @@ function Verrify(request)
             if(auth_cookie)
             {
                 const email = jwt.verify(auth_cookie , process.env.JWT_SECRET).email
-                return {summary:birthdayPerson , description:birthdaydescription , startDate:dateofbirth , endDate:dateofbirth , location , email , location:'Pitipana Homagama, Sri Lanka'};
+                return {summary:birthdayPerson , description:birthdaydescription , startDate:dateofbirth , endDate:dateofbirth , email , location:'Pitipana Homagama, Sri Lanka'};
             }
             else{
                 throw new VerifyError('Cookie error')
@@ -237,6 +237,7 @@ router.get('/get-events' , async (req,res) => {
 
 })
 
+
 router.post('/update-event' , async (req,res) => {
 
     try
@@ -259,22 +260,12 @@ router.post('/update-event' , async (req,res) => {
         
         const calendar = google.calendar({version:'v3' , auth:oauth2Client})
 
-        let bas64Description;
+        const bas64Description = base64encode(JSON.stringify({
+            type:req.query.type,
+            description:description
+        }))
 
-        if(req.query.type === "Event")
-        {
-            bas64Description = base64encode(JSON.stringify({
-                type:"Event",
-                description:description
-            }))
-        }
-        else if(req.query.type === "Birthday")
-        {
-            bas64Description = base64encode(JSON.stringify({
-                type:"Birthday",
-                description:description
-            }))
-        }
+        console.log(req.query.type)
 
         const response = await calendar.events.update({
             calendarId:'primary',
@@ -341,7 +332,6 @@ router.get('/delete-event', async (req,res) => {
             eventId:req.query.id,
         })
         res.status(response.status).json(response.data);
-        console.log(response.data)
         
     }
     catch(err)
