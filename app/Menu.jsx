@@ -48,7 +48,7 @@ const Menu = () => {
       const response = await axios.post('/api/calendar/operations/create-event',event)
       document.getElementById('eventForms').reset();
       setLoad(false);
-      console.log(response);
+      // console.log(response);
       EventForm.reset();
     }
     catch(err)
@@ -65,7 +65,7 @@ const Menu = () => {
       const response = await axios.post('/api/calendar/operations/create-birthday',event)
       document.getElementById('birthdayForms').reset();
       setLoad(false);
-      console.log(response.data);
+      // console.log(response.data);
       BirthdayForm.reset();
     }
     catch(err)
@@ -92,11 +92,11 @@ const Menu = () => {
 
 
   const HandleFilter = (event) => {
-    setCookie(event.target.name, event.target.value , {maxAge: 60 * 6 * 24});
+    setCookie(event.target.name, event.target.value , {maxAge: 31536000});
   }
 
   const HandleFilterChecked = (event) => {
-    setCookie(event.target.name, event.target.checked , {maxAge: 60 * 6 * 24});
+    setCookie(event.target.name, event.target.checked , {maxAge: 31536000});
     setCustomFilter(event.target.checked)
   }
 

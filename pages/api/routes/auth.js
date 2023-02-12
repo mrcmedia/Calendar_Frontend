@@ -136,7 +136,17 @@ router.get('/verify-cookie',(req,res) => {
 })
 
 router.get('/get-user', (req,res)=> {
-    var cookies = cookie.parse(req.headers.cookie || '');
-    res.json(jwt.decode(cookies.auth));
+    try
+    {
+        var cookies = cookie.parse(req.headers.cookie || '');
+        res.json(jwt.verify(cookies.auth ,process.env.JWT_SECRET));
+    }
+    catch(err)
+    {
+        if(err instanceof jwt.JsonWebTokenError)
+        {
+            res.status(400).json(err.message);
+        }
+    }
 });
 module.exports = router;

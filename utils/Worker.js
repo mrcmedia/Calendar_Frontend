@@ -5,9 +5,11 @@ addEventListener('message', (event) =>{
 })
 
 
-setInterval(() => {
-    postMessage("go on")
-}, 10000);
+// setInterval(() => {
+//     postMessage("go on")
+// }, 10000);
+
+postMessage("go on");
 
 
 // 1800000

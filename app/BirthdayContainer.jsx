@@ -11,14 +11,14 @@ const BirthdayContainer = ({summary , stDate , description , id , type}) => {
   const handleDelete = () => {
     setIsDelete(true)
     setTimeout(() => {
-      document.getElementById(id).classList.add('activepop');
+      document.getElementById(`${id}-del`).classList.add('activepop');
     },[100])
   }
 
   useEffect(() => {
     if(isDelete)
     {
-      document.getElementById(id).addEventListener('click' , closeDeletePop)
+      document.getElementById(`${id}-del`).addEventListener('click' , closeDeletePop)
     }
   },[isDelete])
 
@@ -26,8 +26,8 @@ const BirthdayContainer = ({summary , stDate , description , id , type}) => {
   {
     if(event.target === this)
     {
-      document.getElementById(id).classList.remove('activepop');
-      document.getElementById(id).removeEventListener('click' , closeDeletePop)
+      document.getElementById(`${id}-del`).classList.remove('activepop');
+      document.getElementById(`${id}-del`).removeEventListener('click' , closeDeletePop)
       setTimeout(() => {
         setIsDelete(false);
       },[300])
@@ -52,7 +52,7 @@ const BirthdayContainer = ({summary , stDate , description , id , type}) => {
 
   return (
     
-    <div className='relative'>
+    <div id={`${id}-main`} className='conts relative'>
       <div className='w-full flex-col lg:p-2 mt-5 relative max-h-[250px] flex min-h-fit items-center bg-slate-50'>
           <div className='p-3 overflow-y-scroll min-h-fit max-h-[250px] w-full'>
               <h1 className='text-4xl'>{summary}</h1>
@@ -61,13 +61,13 @@ const BirthdayContainer = ({summary , stDate , description , id , type}) => {
               <p>{description}</p>
           </div>
       </div>
-      <div className='flex justify-between shadow-md w-full bg-slate-50'>
-        <button className='text-xs w-fit hover:bg-blue-600 rounded-tr hover:text-white transition duration-200 p-2' onClick={() => {window.location.href = `/Update?id=${id}&type=${type}&summary=${summary}&description=${description}&startDate=${stDate}`}}><i className="fa fa-edit pr-1" aria-hidden="true"></i>Update</button>
+      <div className='flex justify-end shadow-md w-full bg-slate-50'>
+        <button className='hidden text-xs w-fit hover:bg-blue-600 rounded-tr hover:text-white transition duration-200 p-2' onClick={() => {window.location.href = `/Update?id=${id}&type=${type}&summary=${summary}&description=${description}&startDate=${stDate}`}}><i className="fa fa-edit pr-1" aria-hidden="true"></i>Update</button>
         <button className='text-xs w-fit hover:bg-red-600 rounded-tl hover:text-white transition  duration-200 p-2' onClick={handleDelete}><i className="fa fa-eraser pr-1" aria-hidden="true"></i>Delete</button>
       </div>
 
       {isDelete && (
-          <div id={id} className='absolute delete-popup top-0 left-0 right-0 bottom-0 flex items-center justify-center z-50 bg-black/90'>
+          <div id={`${id}-del`} className=' absolute delete-popup top-0 left-0 right-0 bottom-0 flex items-center justify-center z-50 bg-black/90'>
             <div className='w-[200px] p-3 bg-white rounded-lg'>
               <h1 className='text-lg text-red-500'>Delete</h1>
               <p className='text-xs'>Do you want to delete this?</p>

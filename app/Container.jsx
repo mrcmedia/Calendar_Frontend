@@ -22,7 +22,15 @@ async function GetData(){
 
 const Container = () => {
 
-  // const workerRef =useRef();
+  useEffect(() => {
+    axios.get('/api/calendar/auth/verify-cookie' ,).catch((error) => {
+      console.error(error);
+      window.location.href = "/signin";
+    })
+  },[])
+
+
+  const workerRef =useRef();
 
   const [data , setData] = useState([]);
   const [isload , setIsload] = useState(true);
@@ -36,7 +44,7 @@ const Container = () => {
       {
         setData(await GetData())
         setIsBuffer(false);
-        // workerRef.current.postMessage('starting ...');
+        workerRef.current.postMessage('starting ...');
       }
       get()
       setIsload(false);
@@ -44,25 +52,30 @@ const Container = () => {
   },[])
 
   useEffect(()=> {
-    // if(workerRef.current !== new Worker(new URL('../utils/Worker.js', import.meta.url)))
-    // {
-    //   workerRef.current =  new Worker(new URL('../utils/Worker.js', import.meta.url))
-    // }
-    // workerRef.current.onmessage = (message) => {
-    //   if(data.length > 0 && message.data === "go on")
-    //   {
-    //     console.log('calling')
-    //     data.map(({start:dateTime}) => {
-    //       if(getDateTime(new Date(dateTime.dateTime)) === getDateTime(new Date()))
-    //       {
-    //         console.log(`${new Date()} jus came`);
-    //       }
-    //     })
-    //   }
-    // }
+    if(workerRef.current !== '')
+    {
+      workerRef.current =  new Worker(new URL('../utils/Worker.js', import.meta.url))
+    }
+    workerRef.current.onmessage = (message) => {
+      if(data.length > 0 && message.data === "go on")
+      {
+        data.map(({start:dateTime , id}) => {
+          if(getDateTime(new Date(dateTime.dateTime)) === getDateTime(new Date()))
+          {
+            const ado = document.querySelectorAll('.conts')
+            ado.forEach((items) => {
+              if(items.getAttribute('id') === id)
+              {
+                document.getElementById('container-ev').location.href = id;
+              }
+            }) 
+          }
+        })
+      }
+    }
 
     return (()=> {
-      // workerRef.current.terminate(0);
+      workerRef.current.terminate(0);
     })
   },[data])
   
