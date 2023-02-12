@@ -52,7 +52,7 @@ const BirthdayContainer = ({summary , stDate , description , id , type}) => {
 
   return (
     
-    <div id={`${id}-main`} className='conts relative'>
+    <div id={id} className='conts relative'>
       <div className='w-full flex-col lg:p-2 mt-5 relative max-h-[250px] flex min-h-fit items-center bg-slate-50'>
           <div className='p-3 overflow-y-scroll min-h-fit max-h-[250px] w-full'>
               <h1 className='text-4xl'>{summary}</h1>

@@ -52,23 +52,15 @@ const Container = () => {
   },[])
 
   useEffect(()=> {
-    if(workerRef.current !== '')
-    {
-      workerRef.current =  new Worker(new URL('../utils/Worker.js', import.meta.url))
-    }
+    workerRef.current =  new Worker(new URL('../utils/Worker.js', import.meta.url))
     workerRef.current.onmessage = (message) => {
       if(data.length > 0 && message.data === "go on")
       {
-        data.map(({start:dateTime , id}) => {
+        data.forEach(({start:dateTime , id}) => {
           if(getDateTime(new Date(dateTime.dateTime)) === getDateTime(new Date()))
           {
-            const ado = document.querySelectorAll('.conts')
-            ado.forEach((items) => {
-              if(items.getAttribute('id') === id)
-              {
-                document.getElementById('container-ev').location.href = id;
-              }
-            }) 
+            document.getElementById(`${id}-main`).scrollIntoView({behavior:'smooth'}) 
+            console.log('hellooo');
           }
         })
       }
