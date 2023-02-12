@@ -92,11 +92,11 @@ const Menu = () => {
 
 
   const HandleFilter = (event) => {
-    setCookie(event.target.name, event.target.value , {maxAge: 31536000});
+    setCookie(event.target.name, event.target.value , {maxAge: 2147483647});
   }
 
   const HandleFilterChecked = (event) => {
-    setCookie(event.target.name, event.target.checked , {maxAge: 31536000});
+    setCookie(event.target.name, event.target.checked , {maxAge: 2147483647});
     setCustomFilter(event.target.checked)
   }
 

@@ -1,13 +1,24 @@
+"use client";
+import axios from "axios";
 import { useEffect } from "react";
 import Body from "./Body"
 import Header from "./Header"
 export default function Home() {
 
   useEffect(() => {
-    axios.get('/api/calendar/auth/verify-cookie' ,).catch((error) => {
-      console.error(error);
-      window.location.href = "/signin";
-    })
+
+    async function getting()
+    {
+      try
+      {
+        await axios.get('/api/calendar/auth/verify-cookie')
+        console.log('already logeed in');
+        window.location.href = "/";
+
+      }
+      catch(err){}
+    }
+    
   },[])
 
 

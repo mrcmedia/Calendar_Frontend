@@ -219,19 +219,19 @@ router.get('/get-events' , async (req,res) => {
     {
         if(err instanceof jwt.JsonWebTokenError)
         {
-            res.status(400).json(err.message);
+            res.status(400).send(err.message);
         }
         else if(err instanceof VerifyError)
         {
-            res.status(400).json(err.message);
+            res.status(400).send(err.message);
         }
         else if(err instanceof Error)
         {
-            res.status(400).json(err.message);
+            res.status(400).send(err.message);
         }
         else
         {
-            res.status(err.response.status).json(err.message)
+            res.status(err.response.status).send(err.message)
         }
     }
 
